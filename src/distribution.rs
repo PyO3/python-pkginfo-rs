@@ -1,3 +1,8 @@
+use std::str::FromStr;
+
+use crate::Error;
+use mailparse::MailHeaderMap;
+
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Distribution {
     /// Version of the file format; legal values are “1.0”, “1.1”, “1.2”, “2.1” and “2.2”.
@@ -61,4 +66,32 @@ pub struct Distribution {
     /// A string stating the markup syntax (if any) used in the distribution’s description,
     /// so that tools can intelligently render the description.
     pub description_content_type: Option<String>,
+}
+
+impl FromStr for Distribution {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let msg = mailparse::parse_mail(s.as_bytes())?;
+        let headers = msg.get_headers();
+        let metadata_version = headers
+            .get_first_value("Metadata-Version")
+            .ok_or_else(|| Error::KeyError("Metadata-Version"))?;
+        Ok(Distribution {
+            metadata_version,
+            ..Default::default()
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Distribution;
+
+    #[test]
+    fn test_parse_from_str() {
+        let s = "Metadata-Version: 1.0";
+        let dist: Distribution = s.parse().unwrap();
+        assert_eq!(dist.metadata_version, "1.0");
+    }
 }
