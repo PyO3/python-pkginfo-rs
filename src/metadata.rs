@@ -73,6 +73,23 @@ impl Metadata {
     pub fn parse(content: &[u8]) -> Result<Self, Error> {
         let msg = mailparse::parse_mail(content)?;
         let headers = msg.get_headers();
+        let get_first_value = |name| {
+            headers.get_first_value(name).and_then(|value| {
+                if value == "UNKNOWN" {
+                    None
+                } else {
+                    Some(value)
+                }
+            })
+        };
+        let get_all_values = |name| {
+            let values: Vec<String> = headers
+                .get_all_values(name)
+                .into_iter()
+                .filter(|value| value != "UNKNOWN")
+                .collect();
+            values
+        };
         let metadata_version = headers
             .get_first_value("Metadata-Version")
             .ok_or_else(|| Error::FieldNotFound("Metadata-Version"))?;
@@ -82,32 +99,32 @@ impl Metadata {
         let version = headers
             .get_first_value("Version")
             .ok_or_else(|| Error::FieldNotFound("Version"))?;
-        let platforms = headers.get_all_values("Platform");
-        let supported_platforms = headers.get_all_values("Supported-Platform");
-        let summary = headers.get_first_value("Summary");
+        let platforms = get_all_values("Platform");
+        let supported_platforms = get_all_values("Supported-Platform");
+        let summary = get_first_value("Summary");
         let body = msg.get_body()?;
         let description = if !body.trim().is_empty() {
             Some(body)
         } else {
-            headers.get_first_value("Description")
+            get_first_value("Description")
         };
-        let keywords = headers.get_first_value("Keywords");
-        let home_page = headers.get_first_value("Home-Page");
-        let download_url = headers.get_first_value("Download-URL");
-        let author = headers.get_first_value("Author");
-        let author_email = headers.get_first_value("Author-email");
-        let license = headers.get_first_value("License");
-        let classifiers = headers.get_all_values("Classifier");
-        let requires_dist = headers.get_all_values("Requires-Dist");
-        let provides_dist = headers.get_all_values("Provides-Dist");
-        let obsoletes_dist = headers.get_all_values("Obsoletes-Dist");
-        let maintainer = headers.get_first_value("Maintainer");
-        let maintainer_email = headers.get_first_value("Maintainer-email");
-        let requires_python = headers.get_first_value("Requires-Python");
-        let requires_external = headers.get_all_values("Requires-External");
-        let project_urls = headers.get_all_values("Project-URL");
-        let provides_extras = headers.get_all_values("Provides-Extra");
-        let description_content_type = headers.get_first_value("Description-Content-Type");
+        let keywords = get_first_value("Keywords");
+        let home_page = get_first_value("Home-Page");
+        let download_url = get_first_value("Download-URL");
+        let author = get_first_value("Author");
+        let author_email = get_first_value("Author-email");
+        let license = get_first_value("License");
+        let classifiers = get_all_values("Classifier");
+        let requires_dist = get_all_values("Requires-Dist");
+        let provides_dist = get_all_values("Provides-Dist");
+        let obsoletes_dist = get_all_values("Obsoletes-Dist");
+        let maintainer = get_first_value("Maintainer");
+        let maintainer_email = get_first_value("Maintainer-email");
+        let requires_python = get_first_value("Requires-Python");
+        let requires_external = get_all_values("Requires-External");
+        let project_urls = get_all_values("Project-URL");
+        let provides_extras = get_all_values("Provides-Extra");
+        let description_content_type = get_first_value("Description-Content-Type");
         Ok(Metadata {
             metadata_version,
             name,
