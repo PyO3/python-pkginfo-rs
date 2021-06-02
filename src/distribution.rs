@@ -8,7 +8,7 @@ use crate::{Error, Metadata};
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum DistributionType {
     SDist,
-    BDist,
+    Egg,
     Wheel,
 }
 
@@ -31,7 +31,7 @@ impl Distribution {
         if let Some(ext) = path.extension().and_then(|ext| ext.to_str()) {
             let dist_type = match ext {
                 "zip" | "gz" => DistributionType::SDist,
-                "egg" => DistributionType::BDist,
+                "egg" => DistributionType::Egg,
                 "whl" => DistributionType::Wheel,
                 _ => return Err(Error::UnknownDistributionType),
             };
@@ -44,7 +44,7 @@ impl Distribution {
                     };
                     Self::parse_sdist(path, sdist_type)
                 }
-                DistributionType::BDist => Self::parse_bdist(path),
+                DistributionType::Egg => Self::parse_egg(path),
                 DistributionType::Wheel => Self::parse_wheel(path),
             }?;
             return Ok(Self {
@@ -69,16 +69,20 @@ impl Distribution {
         todo!()
     }
 
-    fn parse_bdist(path: &Path) -> Result<Metadata, Error> {
-        todo!()
+    fn parse_egg(path: &Path) -> Result<Metadata, Error> {
+        Self::parse_zip(path, "EGG-INFO/PKG-INFO")
     }
 
     fn parse_wheel(path: &Path) -> Result<Metadata, Error> {
+        Self::parse_zip(path, ".dist-info/METADATA")
+    }
+
+    fn parse_zip(path: &Path, metadata_file_suffix: &str) -> Result<Metadata, Error> {
         let reader = BufReader::new(fs_err::File::open(path)?);
         let mut archive = ZipArchive::new(reader)?;
         let metadata_files: Vec<_> = archive
             .file_names()
-            .filter(|name| name.ends_with(".dist-info/METADATA"))
+            .filter(|name| name.ends_with(metadata_file_suffix))
             .map(ToString::to_string)
             .collect();
         match metadata_files.as_slice() {
