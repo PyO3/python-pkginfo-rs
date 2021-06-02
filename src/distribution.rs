@@ -1,6 +1,7 @@
 use std::io::{BufReader, Read};
 use std::path::Path;
 
+use flate2::read::GzDecoder;
 use zip::ZipArchive;
 
 use crate::{Error, Metadata};
@@ -66,7 +67,32 @@ impl Distribution {
     }
 
     fn parse_sdist(path: &Path, sdist_type: SDistType) -> Result<Metadata, Error> {
-        todo!()
+        match sdist_type {
+            SDistType::Zip => Self::parse_zip(path, "PKG-INFO"),
+            SDistType::TarGz => {
+                let mut reader =
+                    tar::Archive::new(GzDecoder::new(BufReader::new(fs_err::File::open(path)?)));
+                let metadata_file = reader
+                    .entries()?
+                    .map(|entry| -> Result<_, Error> {
+                        let entry = entry?;
+                        if entry.path()?.ends_with("PKG-INFO") {
+                            Ok(Some(entry))
+                        } else {
+                            Ok(None)
+                        }
+                    })
+                    .find_map(|x| x.transpose());
+                if let Some(metadata_file) = metadata_file {
+                    let mut entry = metadata_file?;
+                    let mut buf = Vec::new();
+                    entry.read_to_end(&mut buf)?;
+                    Metadata::parse(&buf)
+                } else {
+                    Err(Error::MetadataNotFound)
+                }
+            }
+        }
     }
 
     fn parse_egg(path: &Path) -> Result<Metadata, Error> {
@@ -90,6 +116,14 @@ impl Distribution {
             [metadata_file] => {
                 let mut buf = Vec::new();
                 archive.by_name(metadata_file)?.read_to_end(&mut buf)?;
+                Metadata::parse(&buf)
+            }
+            [file1, file2]
+                if file1.ends_with(".egg-info/PKG-INFO")
+                    || file2.ends_with(".egg-info/PKG-INFO") =>
+            {
+                let mut buf = Vec::new();
+                archive.by_name(file1)?.read_to_end(&mut buf)?;
                 Metadata::parse(&buf)
             }
             _ => Err(Error::MultipleMetadataFiles(metadata_files)),

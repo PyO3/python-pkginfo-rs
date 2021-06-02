@@ -21,3 +21,25 @@ fn test_parse_egg() {
     assert!(metadata.home_page.is_none());
     assert!(metadata.download_url.is_none());
 }
+
+#[test]
+fn test_parse_sdist_zip() {
+    let dist = Distribution::new("tests/fixtures/build-0.4.0.zip").unwrap();
+    assert_eq!(dist.r#type(), DistributionType::SDist);
+    let metadata = dist.metadata();
+    assert_eq!(metadata.metadata_version, "2.1");
+    assert_eq!(metadata.name, "build");
+    assert!(metadata.home_page.is_none());
+    assert!(metadata.download_url.is_none());
+}
+
+#[test]
+fn test_parse_sdist_tar_gz() {
+    let dist = Distribution::new("tests/fixtures/build-0.4.0.tar.gz").unwrap();
+    assert_eq!(dist.r#type(), DistributionType::SDist);
+    let metadata = dist.metadata();
+    assert_eq!(metadata.metadata_version, "2.1");
+    assert_eq!(metadata.name, "build");
+    assert!(metadata.home_page.is_none());
+    assert!(metadata.download_url.is_none());
+}
