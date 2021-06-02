@@ -68,11 +68,10 @@ pub struct Distribution {
     pub description_content_type: Option<String>,
 }
 
-impl FromStr for Distribution {
-    type Err = Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let msg = mailparse::parse_mail(s.as_bytes())?;
+impl Distribution {
+    /// Parse distribution metadata from metadata bytes
+    pub fn parse(content: &[u8]) -> Result<Self, Error> {
+        let msg = mailparse::parse_mail(content)?;
         let headers = msg.get_headers();
         let metadata_version = headers
             .get_first_value("Metadata-Version")
@@ -81,6 +80,14 @@ impl FromStr for Distribution {
             metadata_version,
             ..Default::default()
         })
+    }
+}
+
+impl FromStr for Distribution {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Distribution::parse(s.as_bytes())
     }
 }
 
