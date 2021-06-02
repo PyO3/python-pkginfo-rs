@@ -17,6 +17,17 @@ python-pkginfo = "0.1"
 
 then you are good to go. If you are using Rust 2015 you have to add ``extern crate python_pkginfo`` to your crate root as well.
 
+## Example
+
+```rust
+use python_pkginfo::Distribution;
+
+fn main() {
+    let dist = Distribution::new("path/to/package.whl").unwrap();
+    println!("{:#?}", dist.metadata());
+}
+```
+
 ## License
 
 This work is released under the MIT license. A copy of the license is provided in the [LICENSE](./LICENSE) file.
