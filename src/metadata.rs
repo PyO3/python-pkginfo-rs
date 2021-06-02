@@ -4,7 +4,7 @@ use crate::Error;
 use mailparse::MailHeaderMap;
 
 #[derive(Debug, Clone, Default, PartialEq)]
-pub struct Distribution {
+pub struct Metadata {
     /// Version of the file format; legal values are “1.0”, “1.1”, “1.2”, “2.1” and “2.2”.
     pub metadata_version: String,
     /// The name of the distribution.
@@ -68,7 +68,7 @@ pub struct Distribution {
     pub description_content_type: Option<String>,
 }
 
-impl Distribution {
+impl Metadata {
     /// Parse distribution metadata from metadata bytes
     pub fn parse(content: &[u8]) -> Result<Self, Error> {
         let msg = mailparse::parse_mail(content)?;
@@ -108,7 +108,7 @@ impl Distribution {
         let project_urls = headers.get_all_values("Project-URL");
         let provides_extras = headers.get_all_values("Provides-Extra");
         let description_content_type = headers.get_first_value("Description-Content-Type");
-        Ok(Distribution {
+        Ok(Metadata {
             metadata_version,
             name,
             version,
@@ -137,41 +137,41 @@ impl Distribution {
     }
 }
 
-impl FromStr for Distribution {
+impl FromStr for Metadata {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Distribution::parse(s.as_bytes())
+        Metadata::parse(s.as_bytes())
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::Distribution;
+    use super::Metadata;
     use crate::Error;
 
     #[test]
     fn test_parse_from_str() {
         let s = "Metadata-Version: 1.0";
-        let dist: Result<Distribution, Error> = s.parse();
-        assert!(matches!(dist, Err(Error::FieldNotFound("Name"))));
+        let meta: Result<Metadata, Error> = s.parse();
+        assert!(matches!(meta, Err(Error::FieldNotFound("Name"))));
 
         let s = "Metadata-Version: 1.0\nName: asdf";
-        let dist = Distribution::parse(s.as_bytes());
-        assert!(matches!(dist, Err(Error::FieldNotFound("Version"))));
+        let meta = Metadata::parse(s.as_bytes());
+        assert!(matches!(meta, Err(Error::FieldNotFound("Version"))));
 
         let s = "Metadata-Version: 1.0\nName: asdf\nVersion: 1.0";
-        let dist = Distribution::parse(s.as_bytes()).unwrap();
-        assert_eq!(dist.metadata_version, "1.0");
-        assert_eq!(dist.name, "asdf");
-        assert_eq!(dist.version, "1.0");
+        let meta = Metadata::parse(s.as_bytes()).unwrap();
+        assert_eq!(meta.metadata_version, "1.0");
+        assert_eq!(meta.name, "asdf");
+        assert_eq!(meta.version, "1.0");
 
         let s = "Metadata-Version: 1.0\nName: asdf\nVersion: 1.0\nDescription: a Python package";
-        let dist: Distribution = s.parse().unwrap();
-        assert_eq!(dist.description.as_deref(), Some("a Python package"));
+        let meta: Metadata = s.parse().unwrap();
+        assert_eq!(meta.description.as_deref(), Some("a Python package"));
 
         let s = "Metadata-Version: 1.0\nName: asdf\nVersion: 1.0\n\na Python package";
-        let dist: Distribution = s.parse().unwrap();
-        assert_eq!(dist.description.as_deref(), Some("a Python package"));
+        let meta: Metadata = s.parse().unwrap();
+        assert_eq!(meta.description.as_deref(), Some("a Python package"));
     }
 }
