@@ -23,7 +23,7 @@ pub struct Distribution {
     pub description: Option<String>,
     /// A list of additional keywords, separated by commas, to be used to
     /// assist searching for the distribution in a larger catalog.
-    pub keywords: Vec<String>,
+    pub keywords: Option<String>,
     /// A string containing the URL for the distribution’s home page.
     pub home_page: Option<String>,
     /// A string containing the URL from which this version of the distribution can be downloaded.
@@ -75,10 +75,64 @@ impl Distribution {
         let headers = msg.get_headers();
         let metadata_version = headers
             .get_first_value("Metadata-Version")
-            .ok_or_else(|| Error::KeyError("Metadata-Version"))?;
+            .ok_or_else(|| Error::FieldNotFound("Metadata-Version"))?;
+        let name = headers
+            .get_first_value("Name")
+            .ok_or_else(|| Error::FieldNotFound("Name"))?;
+        let version = headers
+            .get_first_value("Version")
+            .ok_or_else(|| Error::FieldNotFound("Version"))?;
+        let platforms = headers.get_all_values("Platform");
+        let supported_platforms = headers.get_all_values("Supported-Platform");
+        let summary = headers.get_first_value("Summary");
+        let body = msg.get_body()?;
+        let description = if !body.trim().is_empty() {
+            Some(body)
+        } else {
+            headers.get_first_value("Description")
+        };
+        let keywords = headers.get_first_value("Keywords");
+        let home_page = headers.get_first_value("Home-Page");
+        let download_url = headers.get_first_value("Download-URL");
+        let author = headers.get_first_value("Author");
+        let author_email = headers.get_first_value("Author-email");
+        let license = headers.get_first_value("License");
+        let classifiers = headers.get_all_values("Classifier");
+        let requires_dist = headers.get_all_values("Requires-Dist");
+        let provides_dist = headers.get_all_values("Provides-Dist");
+        let obsoletes_dist = headers.get_all_values("Obsoletes-Dist");
+        let maintainer = headers.get_first_value("Maintainer");
+        let maintainer_email = headers.get_first_value("Maintainer-email");
+        let requires_python = headers.get_first_value("Requires-Python");
+        let requires_external = headers.get_all_values("Requires-External");
+        let project_urls = headers.get_all_values("Project-URL");
+        let provides_extras = headers.get_all_values("Provides-Extra");
+        let description_content_type = headers.get_first_value("Description-Content-Type");
         Ok(Distribution {
             metadata_version,
-            ..Default::default()
+            name,
+            version,
+            platforms,
+            supported_platforms,
+            summary,
+            description,
+            keywords,
+            home_page,
+            download_url,
+            author,
+            author_email,
+            license,
+            classifiers,
+            requires_dist,
+            provides_dist,
+            obsoletes_dist,
+            maintainer,
+            maintainer_email,
+            requires_python,
+            requires_external,
+            project_urls,
+            provides_extras,
+            description_content_type,
         })
     }
 }
@@ -94,11 +148,30 @@ impl FromStr for Distribution {
 #[cfg(test)]
 mod tests {
     use super::Distribution;
+    use crate::Error;
 
     #[test]
     fn test_parse_from_str() {
         let s = "Metadata-Version: 1.0";
-        let dist: Distribution = s.parse().unwrap();
+        let dist: Result<Distribution, Error> = s.parse();
+        assert!(matches!(dist, Err(Error::FieldNotFound("Name"))));
+
+        let s = "Metadata-Version: 1.0\nName: asdf";
+        let dist = Distribution::parse(s.as_bytes());
+        assert!(matches!(dist, Err(Error::FieldNotFound("Version"))));
+
+        let s = "Metadata-Version: 1.0\nName: asdf\nVersion: 1.0";
+        let dist = Distribution::parse(s.as_bytes()).unwrap();
         assert_eq!(dist.metadata_version, "1.0");
+        assert_eq!(dist.name, "asdf");
+        assert_eq!(dist.version, "1.0");
+
+        let s = "Metadata-Version: 1.0\nName: asdf\nVersion: 1.0\nDescription: a Python package";
+        let dist: Distribution = s.parse().unwrap();
+        assert_eq!(dist.description.as_deref(), Some("a Python package"));
+
+        let s = "Metadata-Version: 1.0\nName: asdf\nVersion: 1.0\n\na Python package";
+        let dist: Distribution = s.parse().unwrap();
+        assert_eq!(dist.description.as_deref(), Some("a Python package"));
     }
 }
