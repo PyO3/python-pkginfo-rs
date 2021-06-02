@@ -3,6 +3,7 @@ use std::str::FromStr;
 use crate::Error;
 use mailparse::MailHeaderMap;
 
+/// Python package metadata
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Metadata {
     /// Version of the file format; legal values are “1.0”, “1.1”, “1.2”, “2.1” and “2.2”.

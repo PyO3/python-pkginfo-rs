@@ -6,10 +6,14 @@ use zip::ZipArchive;
 
 use crate::{Error, Metadata};
 
+/// Python package distribution type
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum DistributionType {
+    /// Source distribution
     SDist,
+    /// Binary distribution egg format
     Egg,
+    /// Binary distribution wheel format
     Wheel,
 }
 
@@ -19,6 +23,7 @@ enum SDistType {
     TarGz,
 }
 
+/// Python package distribution
 #[derive(Debug, Clone)]
 pub struct Distribution {
     dist_type: DistributionType,
