@@ -18,54 +18,74 @@ pub struct Metadata {
     pub version: String,
     /// A Platform specification describing an operating system supported by the distribution
     /// which is not listed in the “Operating System” Trove classifiers.
-    #[cfg_attr(feature = "serde", serde(rename = "platform"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(rename = "platform", skip_serializing_if = "Vec::is_empty")
+    )]
     pub platforms: Vec<String>,
     /// Binary distributions containing a PKG-INFO file will use the Supported-Platform field
     /// in their metadata to specify the OS and CPU for which the binary distribution was compiled.
     #[cfg_attr(feature = "serde", serde(skip_serializing))]
     pub supported_platforms: Vec<String>,
     /// A one-line summary of what the distribution does.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub summary: Option<String>,
     /// A longer description of the distribution that can run to several paragraphs.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub description: Option<String>,
     /// A list of additional keywords, separated by commas, to be used to
     /// assist searching for the distribution in a larger catalog.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub keywords: Option<String>,
     /// A string containing the URL for the distribution’s home page.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub home_page: Option<String>,
     /// A string containing the URL from which this version of the distribution can be downloaded.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub download_url: Option<String>,
     /// A string containing the author’s name at a minimum; additional contact information may be provided.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub author: Option<String>,
     /// A string containing the author’s e-mail address. It can contain a name and e-mail address in the legal forms for a RFC-822 `From:` header.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub author_email: Option<String>,
     /// Text indicating the license covering the distribution where the license is not a selection from the `License` Trove classifiers.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub license: Option<String>,
     /// Each entry is a string giving a single classification value for the distribution.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty"))]
     pub classifiers: Vec<String>,
     /// Each entry contains a string naming some other distutils project required by this distribution.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty"))]
     pub requires_dist: Vec<String>,
     /// Each entry contains a string naming a Distutils project which is contained within this distribution.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty"))]
     pub provides_dist: Vec<String>,
     /// Each entry contains a string describing a distutils project’s distribution which this distribution renders obsolete,
     /// meaning that the two projects should not be installed at the same time.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty"))]
     pub obsoletes_dist: Vec<String>,
     /// A string containing the maintainer’s name at a minimum; additional contact information may be provided.
     ///
     /// Note that this field is intended for use when a project is being maintained by someone other than the original author:
     /// it should be omitted if it is identical to `author`.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub maintainer: Option<String>,
     /// A string containing the maintainer’s e-mail address.
     /// It can contain a name and e-mail address in the legal forms for a RFC-822 `From:` header.
     ///
     /// Note that this field is intended for use when a project is being maintained by someone other than the original author:
     /// it should be omitted if it is identical to `author_email`.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub maintainer_email: Option<String>,
     /// This field specifies the Python version(s) that the distribution is guaranteed to be compatible with.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub requires_python: Option<String>,
     /// Each entry contains a string describing some dependency in the system that the distribution is to be used.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty"))]
     pub requires_external: Vec<String>,
     /// A string containing a browsable URL for the project and a label for it, separated by a comma.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty"))]
     pub project_urls: Vec<String>,
     /// A string containing the name of an optional feature. Must be a valid Python identifier.
     /// May be used to make a dependency conditional on whether the optional feature has been requested.
@@ -73,6 +93,7 @@ pub struct Metadata {
     pub provides_extras: Vec<String>,
     /// A string stating the markup syntax (if any) used in the distribution’s description,
     /// so that tools can intelligently render the description.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub description_content_type: Option<String>,
     /// A string containing the name of another core metadata field.
     #[cfg_attr(feature = "serde", serde(skip_serializing))]
