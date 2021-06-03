@@ -1,3 +1,4 @@
+use std::fmt;
 use std::io::{BufReader, Read};
 use std::path::Path;
 use std::str::FromStr;
@@ -32,6 +33,16 @@ pub struct Distribution {
     dist_type: DistributionType,
     metadata: Metadata,
     python_version: String,
+}
+
+impl fmt::Display for DistributionType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            DistributionType::SDist => write!(f, "sdist"),
+            DistributionType::Egg => write!(f, "bdist_egg"),
+            DistributionType::Wheel => write!(f, "bdist_wheel"),
+        }
+    }
 }
 
 impl FromStr for SDistType {
