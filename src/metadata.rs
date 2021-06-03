@@ -1,9 +1,10 @@
 use std::str::FromStr;
 
-use crate::Error;
 use mailparse::MailHeaderMap;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+
+use crate::Error;
 
 /// Python package metadata
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
@@ -17,9 +18,11 @@ pub struct Metadata {
     pub version: String,
     /// A Platform specification describing an operating system supported by the distribution
     /// which is not listed in the “Operating System” Trove classifiers.
+    #[cfg_attr(feature = "serde", serde(rename = "platform"))]
     pub platforms: Vec<String>,
     /// Binary distributions containing a PKG-INFO file will use the Supported-Platform field
     /// in their metadata to specify the OS and CPU for which the binary distribution was compiled.
+    #[cfg_attr(feature = "serde", serde(skip_serializing))]
     pub supported_platforms: Vec<String>,
     /// A one-line summary of what the distribution does.
     pub summary: Option<String>,
@@ -66,11 +69,13 @@ pub struct Metadata {
     pub project_urls: Vec<String>,
     /// A string containing the name of an optional feature. Must be a valid Python identifier.
     /// May be used to make a dependency conditional on whether the optional feature has been requested.
+    #[cfg_attr(feature = "serde", serde(skip_serializing))]
     pub provides_extras: Vec<String>,
     /// A string stating the markup syntax (if any) used in the distribution’s description,
     /// so that tools can intelligently render the description.
     pub description_content_type: Option<String>,
     /// A string containing the name of another core metadata field.
+    #[cfg_attr(feature = "serde", serde(skip_serializing))]
     pub dynamic: Vec<String>,
 }
 
