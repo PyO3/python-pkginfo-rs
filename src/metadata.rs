@@ -6,7 +6,7 @@ use mailparse::MailHeaderMap;
 /// Python package metadata
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Metadata {
-    /// Version of the file format; legal values are “1.0”, “1.1”, “1.2”, “2.1” and “2.2”.
+    /// Version of the file format; legal values are `1.0`, `1.1`, `1.2`, `2.1` and `2.2`.
     pub metadata_version: String,
     /// The name of the distribution.
     pub name: String,
@@ -33,7 +33,7 @@ pub struct Metadata {
     pub author: Option<String>,
     /// A string containing the author’s e-mail address. It can contain a name and e-mail address in the legal forms for a RFC-822 `From:` header.
     pub author_email: Option<String>,
-    /// Text indicating the license covering the distribution where the license is not a selection from the “License” Trove classifiers.
+    /// Text indicating the license covering the distribution where the license is not a selection from the `License` Trove classifiers.
     pub license: Option<String>,
     /// Each entry is a string giving a single classification value for the distribution.
     pub classifiers: Vec<String>,
@@ -67,6 +67,8 @@ pub struct Metadata {
     /// A string stating the markup syntax (if any) used in the distribution’s description,
     /// so that tools can intelligently render the description.
     pub description_content_type: Option<String>,
+    /// A string containing the name of another core metadata field.
+    pub dynamic: Vec<String>,
 }
 
 impl Metadata {
@@ -126,6 +128,7 @@ impl Metadata {
         let project_urls = get_all_values("Project-URL");
         let provides_extras = get_all_values("Provides-Extra");
         let description_content_type = get_first_value("Description-Content-Type");
+        let dynamic = get_all_values("Dynamic");
         Ok(Metadata {
             metadata_version,
             name,
@@ -151,6 +154,7 @@ impl Metadata {
             project_urls,
             provides_extras,
             description_content_type,
+            dynamic,
         })
     }
 }
