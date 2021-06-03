@@ -34,8 +34,41 @@ fn test_parse_sdist_zip() {
 }
 
 #[test]
+fn test_parse_sdist_tar() {
+    let dist = Distribution::new("tests/fixtures/build-0.4.0.tar").unwrap();
+    assert_eq!(dist.r#type(), DistributionType::SDist);
+    let metadata = dist.metadata();
+    assert_eq!(metadata.metadata_version, "2.1");
+    assert_eq!(metadata.name, "build");
+    assert!(metadata.home_page.is_none());
+    assert!(metadata.download_url.is_none());
+}
+
+#[test]
 fn test_parse_sdist_tar_gz() {
     let dist = Distribution::new("tests/fixtures/build-0.4.0.tar.gz").unwrap();
+    assert_eq!(dist.r#type(), DistributionType::SDist);
+    let metadata = dist.metadata();
+    assert_eq!(metadata.metadata_version, "2.1");
+    assert_eq!(metadata.name, "build");
+    assert!(metadata.home_page.is_none());
+    assert!(metadata.download_url.is_none());
+}
+
+#[test]
+fn test_parse_sdist_tar_bz2() {
+    let dist = Distribution::new("tests/fixtures/build-0.4.0.tar.bz2").unwrap();
+    assert_eq!(dist.r#type(), DistributionType::SDist);
+    let metadata = dist.metadata();
+    assert_eq!(metadata.metadata_version, "2.1");
+    assert_eq!(metadata.name, "build");
+    assert!(metadata.home_page.is_none());
+    assert!(metadata.download_url.is_none());
+}
+
+#[test]
+fn test_parse_sdist_tar_xz() {
+    let dist = Distribution::new("tests/fixtures/build-0.4.0.tar.xz").unwrap();
     assert_eq!(dist.r#type(), DistributionType::SDist);
     let metadata = dist.metadata();
     assert_eq!(metadata.metadata_version, "2.1");
