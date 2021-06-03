@@ -1,9 +1,9 @@
 [package]
 name = "python-pkginfo"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["messense <messense@icloud.com>"]
 edition = "2018"
-description = "Query Python package metadata from sdist and bdists and etc."
+description = "Parse Python package metadata from sdist and bdists and etc."
 keywords = ["python", "pkginfo", "metadata"]
 license = "MIT"
 readme = "README.md"

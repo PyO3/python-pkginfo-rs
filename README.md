@@ -4,7 +4,8 @@
 [![Crates.io](https://img.shields.io/crates/v/python-pkginfo.svg)](https://crates.io/crates/python-pkginfo)
 [![docs.rs](https://docs.rs/python-pkginfo/badge.svg)](https://docs.rs/python-pkginfo/)
 
-Query Python package metadata from sdist and bdists and etc.
+Parse Python package metadata from sdist and bdists and etc.
+A Rust port of the [pkginfo](https://pypi.org/project/pkginfo/) Python library.
 
 ## Installation
 
@@ -12,7 +13,7 @@ Add it to your ``Cargo.toml``:
 
 ```toml
 [dependencies]
-python-pkginfo = "0.1"
+python-pkginfo = "0.2"
 ```
 
 then you are good to go. If you are using Rust 2015 you have to add ``extern crate python_pkginfo`` to your crate root as well.
