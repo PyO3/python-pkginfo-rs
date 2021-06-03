@@ -16,5 +16,6 @@ bzip2 = "0.4.2"
 flate2 = "1.0.20"
 fs-err = "2.6.0"
 mailparse = "0.13.4"
+serde = { version = "1.0.126", features = ["derive"], optional = true }
 tar = "0.4.35"
 zip = "0.5.12"

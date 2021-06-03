@@ -2,8 +2,11 @@ use std::str::FromStr;
 
 use crate::Error;
 use mailparse::MailHeaderMap;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// Python package metadata
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Metadata {
     /// Version of the file format; legal values are `1.0`, `1.1`, `1.2`, `2.1` and `2.2`.
