@@ -9,6 +9,7 @@ fn test_parse_wheel() {
     assert_eq!(metadata.name, "build");
     assert!(metadata.home_page.is_none());
     assert!(metadata.download_url.is_none());
+    assert_eq!(dist.python_version(), "py2.py3");
 }
 
 #[test]
@@ -20,6 +21,7 @@ fn test_parse_egg() {
     assert_eq!(metadata.name, "build");
     assert!(metadata.home_page.is_none());
     assert!(metadata.download_url.is_none());
+    assert_eq!(dist.python_version(), "py3.9");
 }
 
 #[test]
@@ -31,6 +33,7 @@ fn test_parse_sdist_zip() {
     assert_eq!(metadata.name, "build");
     assert!(metadata.home_page.is_none());
     assert!(metadata.download_url.is_none());
+    assert_eq!(dist.python_version(), "source");
 }
 
 #[test]
@@ -42,6 +45,7 @@ fn test_parse_sdist_tar_gz() {
     assert_eq!(metadata.name, "build");
     assert!(metadata.home_page.is_none());
     assert!(metadata.download_url.is_none());
+    assert_eq!(dist.python_version(), "source");
 }
 
 #[test]
@@ -53,4 +57,5 @@ fn test_parse_sdist_tar_bz2() {
     assert_eq!(metadata.name, "build");
     assert!(metadata.home_page.is_none());
     assert!(metadata.download_url.is_none());
+    assert_eq!(dist.python_version(), "source");
 }

@@ -31,6 +31,7 @@ enum SDistType {
 pub struct Distribution {
     dist_type: DistributionType,
     metadata: Metadata,
+    python_version: String,
 }
 
 impl FromStr for SDistType {
@@ -58,17 +59,44 @@ impl Distribution {
                 "whl" => DistributionType::Wheel,
                 _ => return Err(Error::UnknownDistributionType),
             };
-            let metadata = match dist_type {
+            let (metadata, python_version) = match dist_type {
                 DistributionType::SDist => {
                     let sdist_type: SDistType = ext.parse()?;
-                    Self::parse_sdist(path, sdist_type)
+                    (Self::parse_sdist(path, sdist_type)?, "source".to_string())
                 }
-                DistributionType::Egg => Self::parse_egg(path),
-                DistributionType::Wheel => Self::parse_wheel(path),
-            }?;
+                DistributionType::Egg => {
+                    let parts: Vec<&str> = path
+                        .file_stem()
+                        .unwrap()
+                        .to_str()
+                        .unwrap()
+                        .split('-')
+                        .collect();
+                    let python_version = match parts.as_slice() {
+                        [_name, _version, py_ver] => py_ver,
+                        _ => "any",
+                    };
+                    (Self::parse_egg(path)?, python_version.to_string())
+                }
+                DistributionType::Wheel => {
+                    let parts: Vec<&str> = path
+                        .file_stem()
+                        .unwrap()
+                        .to_str()
+                        .unwrap()
+                        .split('-')
+                        .collect();
+                    let python_version = match parts.as_slice() {
+                        [_name, _version, py_ver, _abi_tag, _plat_tag] => py_ver,
+                        _ => "any",
+                    };
+                    (Self::parse_wheel(path)?, python_version.to_string())
+                }
+            };
             return Ok(Self {
                 dist_type,
                 metadata,
+                python_version,
             });
         }
         Err(Error::UnknownDistributionType)
@@ -82,6 +110,13 @@ impl Distribution {
     /// Returns distribution metadata
     pub fn metadata(&self) -> &Metadata {
         &self.metadata
+    }
+
+    /// Returns the supported Python version tag
+    ///
+    /// For source distributions the version tag is always `source`
+    pub fn python_version(&self) -> &str {
+        &self.python_version
     }
 
     fn parse_sdist(path: &Path, sdist_type: SDistType) -> Result<Metadata, Error> {
