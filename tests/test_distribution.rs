@@ -36,6 +36,7 @@ fn test_parse_sdist_zip() {
     assert_eq!(dist.python_version(), "source");
 }
 
+#[cfg(feature = "deprecated-formats")]
 #[test]
 fn test_parse_sdist_tar() {
     let dist = Distribution::new("tests/fixtures/build-0.4.0.tar").unwrap();
@@ -59,6 +60,7 @@ fn test_parse_sdist_tar_gz() {
     assert_eq!(dist.python_version(), "source");
 }
 
+#[cfg(feature = "bzip2")]
 #[test]
 fn test_parse_sdist_tar_bz2() {
     let dist = Distribution::new("tests/fixtures/build-0.4.0.tar.bz2").unwrap();
@@ -71,6 +73,7 @@ fn test_parse_sdist_tar_bz2() {
     assert_eq!(dist.python_version(), "source");
 }
 
+#[cfg(feature = "xz")]
 #[test]
 fn test_parse_sdist_tar_xz() {
     let dist = Distribution::new("tests/fixtures/build-0.4.0.tar.xz").unwrap();

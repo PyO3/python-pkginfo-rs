@@ -3,8 +3,10 @@ use std::io::{BufReader, Read};
 use std::path::Path;
 use std::str::FromStr;
 
+#[cfg(feature = "bzip2")]
 use bzip2::read::BzDecoder;
 use flate2::read::GzDecoder;
+#[cfg(feature = "xz")]
 use xz::read::XzDecoder;
 use zip::ZipArchive;
 
@@ -24,9 +26,12 @@ pub enum DistributionType {
 #[derive(Debug, Clone, Copy)]
 enum SDistType {
     Zip,
-    Tar,
     GzTar,
+    #[cfg(feature = "deprecated-formats")]
+    Tar,
+    #[cfg(feature = "bzip2")]
     BzTar,
+    #[cfg(feature = "xz")]
     XzTar,
 }
 
@@ -54,9 +59,12 @@ impl FromStr for SDistType {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let dist_type = match s {
             "zip" => SDistType::Zip,
-            "tar" => SDistType::Tar,
             "gz" => SDistType::GzTar,
+            #[cfg(feature = "deprecated-formats")]
+            "tar" => SDistType::Tar,
+            #[cfg(feature = "bzip2")]
             "bz2" => SDistType::BzTar,
+            #[cfg(feature = "xz")]
             "xz" => SDistType::XzTar,
             _ => return Err(Error::UnknownDistributionType),
         };
@@ -70,9 +78,15 @@ impl Distribution {
         let path = path.as_ref();
         if let Some(ext) = path.extension().and_then(|ext| ext.to_str()) {
             let dist_type = match ext {
-                "zip" | "tar" | "gz" | "bz2" | "xz" => DistributionType::SDist,
+                "zip" | "gz" => DistributionType::SDist,
                 "egg" => DistributionType::Egg,
                 "whl" => DistributionType::Wheel,
+                #[cfg(feature = "deprecated-formats")]
+                "tar" => DistributionType::SDist,
+                #[cfg(feature = "bzip2")]
+                "bz2" => DistributionType::SDist,
+                #[cfg(feature = "xz")]
+                "xz" => DistributionType::SDist,
                 _ => return Err(Error::UnknownDistributionType),
             };
             let (metadata, python_version) = match dist_type {
@@ -141,10 +155,13 @@ impl Distribution {
             SDistType::GzTar => {
                 Self::parse_tar(GzDecoder::new(BufReader::new(fs_err::File::open(path)?)))
             }
+            #[cfg(feature = "deprecated-formats")]
             SDistType::Tar => Self::parse_tar(BufReader::new(fs_err::File::open(path)?)),
+            #[cfg(feature = "bzip2")]
             SDistType::BzTar => {
                 Self::parse_tar(BzDecoder::new(BufReader::new(fs_err::File::open(path)?)))
             }
+            #[cfg(feature = "xz")]
             SDistType::XzTar => {
                 Self::parse_tar(XzDecoder::new(BufReader::new(fs_err::File::open(path)?)))
             }
