@@ -5,6 +5,7 @@ use std::str::FromStr;
 
 use bzip2::read::BzDecoder;
 use flate2::read::GzDecoder;
+use xz::read::XzDecoder;
 use zip::ZipArchive;
 
 use crate::{Error, Metadata};
@@ -23,8 +24,10 @@ pub enum DistributionType {
 #[derive(Debug, Clone, Copy)]
 enum SDistType {
     Zip,
+    Tar,
     GzTar,
     BzTar,
+    XzTar,
 }
 
 /// Python package distribution
@@ -51,8 +54,10 @@ impl FromStr for SDistType {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let dist_type = match s {
             "zip" => SDistType::Zip,
+            "tar" => SDistType::Tar,
             "gz" => SDistType::GzTar,
             "bz2" => SDistType::BzTar,
+            "xz" => SDistType::XzTar,
             _ => return Err(Error::UnknownDistributionType),
         };
         Ok(dist_type)
@@ -65,7 +70,7 @@ impl Distribution {
         let path = path.as_ref();
         if let Some(ext) = path.extension().and_then(|ext| ext.to_str()) {
             let dist_type = match ext {
-                "zip" | "gz" | "bz2" => DistributionType::SDist,
+                "zip" | "tar" | "gz" | "bz2" | "xz" => DistributionType::SDist,
                 "egg" => DistributionType::Egg,
                 "whl" => DistributionType::Wheel,
                 _ => return Err(Error::UnknownDistributionType),
@@ -136,8 +141,12 @@ impl Distribution {
             SDistType::GzTar => {
                 Self::parse_tar(GzDecoder::new(BufReader::new(fs_err::File::open(path)?)))
             }
+            SDistType::Tar => Self::parse_tar(BufReader::new(fs_err::File::open(path)?)),
             SDistType::BzTar => {
                 Self::parse_tar(BzDecoder::new(BufReader::new(fs_err::File::open(path)?)))
+            }
+            SDistType::XzTar => {
+                Self::parse_tar(XzDecoder::new(BufReader::new(fs_err::File::open(path)?)))
             }
         }
     }

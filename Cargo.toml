@@ -18,4 +18,5 @@ fs-err = "2.6.0"
 mailparse = "0.13.4"
 serde = { version = "1.0.126", features = ["derive"], optional = true }
 tar = "0.4.35"
+xz = "0.1.0"
 zip = "0.5.12"
