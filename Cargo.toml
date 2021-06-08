@@ -7,7 +7,7 @@ description = "Parse Python package metadata from sdist and bdists and etc."
 keywords = ["python", "pkginfo", "metadata"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/messense/python-pkginfo-rs"
+repository = "https://github.com/PyO3/python-pkginfo-rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

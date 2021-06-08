@@ -1,6 +1,6 @@
 # python-pkginfo-rs
 
-[![GitHub Actions](https://github.com/messense/python-pkginfo-rs/workflows/CI/badge.svg)](https://github.com/messense/python-pkginfo-rs/actions?query=workflow%3ACI)
+[![GitHub Actions](https://github.com/PyO3/python-pkginfo-rs/workflows/CI/badge.svg)](https://github.com/PyO3/python-pkginfo-rs/actions?query=workflow%3ACI)
 [![Crates.io](https://img.shields.io/crates/v/python-pkginfo.svg)](https://crates.io/crates/python-pkginfo)
 [![docs.rs](https://docs.rs/python-pkginfo/badge.svg)](https://docs.rs/python-pkginfo/)
 
