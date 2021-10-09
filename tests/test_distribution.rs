@@ -55,6 +55,7 @@ fn test_parse_sdist_tar_gz() {
     let metadata = dist.metadata();
     assert_eq!(metadata.metadata_version, "2.1");
     assert_eq!(metadata.name, "build");
+    assert_eq!(metadata.author.as_deref(), Some("Filipe Laíns"));
     assert!(metadata.home_page.is_none());
     assert!(metadata.download_url.is_none());
     assert_eq!(dist.python_version(), "source");
