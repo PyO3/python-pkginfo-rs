@@ -1,6 +1,6 @@
 [package]
 name = "python-pkginfo"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["messense <messense@icloud.com>"]
 edition = "2018"
 description = "Parse Python package metadata from sdist and bdists and etc."
