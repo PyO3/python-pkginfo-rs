@@ -78,14 +78,23 @@ pub struct Metadata {
 impl Metadata {
     /// Parse distribution metadata from metadata bytes
     pub fn parse(content: &[u8]) -> Result<Self, Error> {
-        let msg = mailparse::parse_mail(content)?;
+        // HACK: trick mailparse to parse as UTF-8 instead of ASCII
+        let mut mail = b"Content-Type: text/plain; charset=utf-8\n".to_vec();
+        mail.extend_from_slice(content);
+
+        let msg = mailparse::parse_mail(&mail)?;
         let headers = msg.get_headers();
         let get_first_value = |name| {
-            headers.get_first_value(name).and_then(|value| {
-                if value == "UNKNOWN" {
-                    None
-                } else {
-                    Some(value)
+            headers.get_first_header(name).and_then(|header| {
+                match rfc2047_decoder::decode(header.get_value_raw()) {
+                    Ok(value) => {
+                        if value == "UNKNOWN" {
+                            None
+                        } else {
+                            Some(value)
+                        }
+                    }
+                    Err(_) => None,
                 }
             })
         };
@@ -199,5 +208,10 @@ mod tests {
         let s = "Metadata-Version: 1.0\nName: asdf\nVersion: 1.0\n\na Python package";
         let meta: Metadata = s.parse().unwrap();
         assert_eq!(meta.description.as_deref(), Some("a Python package"));
+
+        let s = "Metadata-Version: 1.0\nName: asdf\nVersion: 1.0\nAuthor: 中文\n\n一个 Python 包";
+        let meta: Metadata = s.parse().unwrap();
+        assert_eq!(meta.author.as_deref(), Some("中文"));
+        assert_eq!(meta.description.as_deref(), Some("一个 Python 包"));
     }
 }
