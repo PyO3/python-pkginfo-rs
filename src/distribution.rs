@@ -222,7 +222,23 @@ impl Distribution {
                 archive.by_name(file1)?.read_to_end(&mut buf)?;
                 Metadata::parse(&buf)
             }
-            _ => Err(Error::MultipleMetadataFiles(metadata_files)),
+            _ => {
+                let top_level_files: Vec<_> = metadata_files
+                    .iter()
+                    .filter(|f| {
+                        let path = Path::new(f);
+                        path.components().count() == 2
+                    })
+                    .collect();
+                if top_level_files.len() == 1 {
+                    let mut buf = Vec::new();
+                    archive
+                        .by_name(&top_level_files[0])?
+                        .read_to_end(&mut buf)?;
+                    return Metadata::parse(&buf);
+                }
+                Err(Error::MultipleMetadataFiles(metadata_files))
+            }
         }
     }
 }
