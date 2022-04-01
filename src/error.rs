@@ -41,9 +41,9 @@ impl fmt::Display for Error {
 impl error::Error for Error {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match self {
-            Error::Io(err) => Some(err),
-            Error::MailParse(err) => Some(err),
-            Error::Zip(err) => Some(err),
+            Error::Io(err) => err.source(),
+            Error::MailParse(err) => err.source(),
+            Error::Zip(err) => err.source(),
             Error::FieldNotFound(_)
             | Error::UnknownDistributionType
             | Error::MetadataNotFound
