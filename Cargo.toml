@@ -16,7 +16,7 @@ bzip2 = { version = "0.4.2", optional = true }
 flate2 = "1.0.20"
 fs-err = "2.6.0"
 mailparse = "0.13.4"
-rfc2047-decoder = "0.1.2"
+rfc2047-decoder = "0.2.0"
 serde = { version = "1.0.126", features = ["derive"], optional = true }
 tar = "0.4.35"
 thiserror = "1.0.30"
