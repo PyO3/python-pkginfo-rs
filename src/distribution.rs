@@ -232,9 +232,7 @@ impl Distribution {
                     .collect();
                 if top_level_files.len() == 1 {
                     let mut buf = Vec::new();
-                    archive
-                        .by_name(top_level_files[0])?
-                        .read_to_end(&mut buf)?;
+                    archive.by_name(top_level_files[0])?.read_to_end(&mut buf)?;
                     return Metadata::parse(&buf);
                 }
                 Err(Error::MultipleMetadataFiles(metadata_files))
