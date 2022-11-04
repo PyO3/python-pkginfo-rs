@@ -13,7 +13,7 @@ use zip::ZipArchive;
 use crate::{Error, Metadata};
 
 /// Python package distribution type
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DistributionType {
     /// Source distribution
     SDist,
@@ -233,7 +233,7 @@ impl Distribution {
                 if top_level_files.len() == 1 {
                     let mut buf = Vec::new();
                     archive
-                        .by_name(&top_level_files[0])?
+                        .by_name(top_level_files[0])?
                         .read_to_end(&mut buf)?;
                     return Metadata::parse(&buf);
                 }

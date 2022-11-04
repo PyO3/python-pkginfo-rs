@@ -8,7 +8,7 @@ use crate::Error;
 
 /// Python package metadata
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Metadata {
     /// Version of the file format; legal values are `1.0`, `1.1`, `1.2`, `2.1` and `2.2`.
     pub metadata_version: String,
@@ -108,13 +108,13 @@ impl Metadata {
         };
         let metadata_version = headers
             .get_first_value("Metadata-Version")
-            .ok_or_else(|| Error::FieldNotFound("Metadata-Version"))?;
+            .ok_or(Error::FieldNotFound("Metadata-Version"))?;
         let name = headers
             .get_first_value("Name")
-            .ok_or_else(|| Error::FieldNotFound("Name"))?;
+            .ok_or(Error::FieldNotFound("Name"))?;
         let version = headers
             .get_first_value("Version")
-            .ok_or_else(|| Error::FieldNotFound("Version"))?;
+            .ok_or(Error::FieldNotFound("Version"))?;
         let platforms = get_all_values("Platform");
         let supported_platforms = get_all_values("Supported-Platform");
         let summary = get_first_value("Summary");
