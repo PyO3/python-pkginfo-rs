@@ -15,7 +15,7 @@ repository = "https://github.com/PyO3/python-pkginfo-rs"
 bzip2 = { version = "0.4.4", optional = true }
 flate2 = "1.0.20"
 fs-err = "2.6.0"
-mailparse = "0.13.4"
+mailparse = "0.14"
 rfc2047-decoder = "0.2.0"
 serde = { version = "1.0.126", features = ["derive"], optional = true }
 tar = "0.4.35"
