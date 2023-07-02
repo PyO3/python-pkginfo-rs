@@ -23,5 +23,8 @@ thiserror = "1.0.30"
 xz = { version = "0.1.0", optional = true }
 zip = { version = "0.6.0", default-features = false, features = ["bzip2", "deflate", "time"] }
 
+[dev-dependencies]
+serde_json = "1.0.99"
+
 [features]
 deprecated-formats = ["bzip2", "xz"]

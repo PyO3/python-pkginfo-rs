@@ -25,21 +25,29 @@ pub struct Metadata {
     #[cfg_attr(feature = "serde", serde(default))]
     pub supported_platforms: Vec<String>,
     /// A one-line summary of what the distribution does.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub summary: Option<String>,
     /// A longer description of the distribution that can run to several paragraphs.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub description: Option<String>,
     /// A list of additional keywords, separated by commas, to be used to
     /// assist searching for the distribution in a larger catalog.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub keywords: Option<String>,
     /// A string containing the URL for the distribution’s home page.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub home_page: Option<String>,
     /// A string containing the URL from which this version of the distribution can be downloaded.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub download_url: Option<String>,
     /// A string containing the author’s name at a minimum; additional contact information may be provided.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub author: Option<String>,
     /// A string containing the author’s e-mail address. It can contain a name and e-mail address in the legal forms for a RFC-822 `From:` header.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub author_email: Option<String>,
     /// Text indicating the license covering the distribution where the license is not a selection from the `License` Trove classifiers.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub license: Option<String>,
     /// Each entry is a string giving a single classification value for the distribution.
     #[cfg_attr(feature = "serde", serde(default))]
@@ -58,14 +66,17 @@ pub struct Metadata {
     ///
     /// Note that this field is intended for use when a project is being maintained by someone other than the original author:
     /// it should be omitted if it is identical to `author`.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub maintainer: Option<String>,
     /// A string containing the maintainer’s e-mail address.
     /// It can contain a name and e-mail address in the legal forms for a RFC-822 `From:` header.
     ///
     /// Note that this field is intended for use when a project is being maintained by someone other than the original author:
     /// it should be omitted if it is identical to `author_email`.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub maintainer_email: Option<String>,
     /// This field specifies the Python version(s) that the distribution is guaranteed to be compatible with.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub requires_python: Option<String>,
     /// Each entry contains a string describing some dependency in the system that the distribution is to be used.
     #[cfg_attr(feature = "serde", serde(default))]
@@ -79,6 +90,7 @@ pub struct Metadata {
     pub provides_extras: Vec<String>,
     /// A string stating the markup syntax (if any) used in the distribution’s description,
     /// so that tools can intelligently render the description.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub description_content_type: Option<String>,
     /// A string containing the name of another core metadata field.
     #[cfg_attr(feature = "serde", serde(default))]
@@ -223,5 +235,12 @@ mod tests {
         let meta: Metadata = s.parse().unwrap();
         assert_eq!(meta.author.as_deref(), Some("中文"));
         assert_eq!(meta.description.as_deref(), Some("一个 Python 包"));
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn test_serde_deserialize() {
+        let input = r#"{"metadata_version": "2.3", "name": "example", "version": "1.0.0"}"#;
+        let _metadata: Metadata = serde_json::from_str(input).unwrap();
     }
 }
