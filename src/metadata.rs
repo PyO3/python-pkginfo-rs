@@ -18,9 +18,11 @@ pub struct Metadata {
     pub version: String,
     /// A Platform specification describing an operating system supported by the distribution
     /// which is not listed in the “Operating System” Trove classifiers.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub platforms: Vec<String>,
     /// Binary distributions containing a PKG-INFO file will use the Supported-Platform field
     /// in their metadata to specify the OS and CPU for which the binary distribution was compiled.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub supported_platforms: Vec<String>,
     /// A one-line summary of what the distribution does.
     pub summary: Option<String>,
@@ -40,13 +42,17 @@ pub struct Metadata {
     /// Text indicating the license covering the distribution where the license is not a selection from the `License` Trove classifiers.
     pub license: Option<String>,
     /// Each entry is a string giving a single classification value for the distribution.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub classifiers: Vec<String>,
     /// Each entry contains a string naming some other distutils project required by this distribution.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub requires_dist: Vec<String>,
     /// Each entry contains a string naming a Distutils project which is contained within this distribution.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub provides_dist: Vec<String>,
     /// Each entry contains a string describing a distutils project’s distribution which this distribution renders obsolete,
     /// meaning that the two projects should not be installed at the same time.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub obsoletes_dist: Vec<String>,
     /// A string containing the maintainer’s name at a minimum; additional contact information may be provided.
     ///
@@ -62,16 +68,20 @@ pub struct Metadata {
     /// This field specifies the Python version(s) that the distribution is guaranteed to be compatible with.
     pub requires_python: Option<String>,
     /// Each entry contains a string describing some dependency in the system that the distribution is to be used.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub requires_external: Vec<String>,
     /// A string containing a browsable URL for the project and a label for it, separated by a comma.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub project_urls: Vec<String>,
     /// A string containing the name of an optional feature. Must be a valid Python identifier.
     /// May be used to make a dependency conditional on whether the optional feature has been requested.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub provides_extras: Vec<String>,
     /// A string stating the markup syntax (if any) used in the distribution’s description,
     /// so that tools can intelligently render the description.
     pub description_content_type: Option<String>,
     /// A string containing the name of another core metadata field.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub dynamic: Vec<String>,
 }
 
