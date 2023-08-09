@@ -86,6 +86,18 @@ fn test_parse_sdist_tar_bz2() {
 
 #[cfg(feature = "xz")]
 #[test]
+fn test_parse_sdist_tar_lz() {
+    let dist = Distribution::new("tests/fixtures/build-0.4.0.tar.lz").unwrap();
+    assert_eq!(dist.r#type(), DistributionType::SDist);
+    let metadata = dist.metadata();
+    assert_eq!(metadata.metadata_version, "2.1");
+    assert_eq!(metadata.name, "build");
+    assert!(metadata.home_page.is_none());
+    assert!(metadata.download_url.is_none());
+}
+
+#[cfg(feature = "xz")]
+#[test]
 fn test_parse_sdist_tar_xz() {
     let dist = Distribution::new("tests/fixtures/build-0.4.0.tar.xz").unwrap();
     assert_eq!(dist.r#type(), DistributionType::SDist);
