@@ -52,9 +52,9 @@ pub struct Metadata {
     /// An SPDX expression indicating the license covering the distribution.
     #[cfg_attr(feature = "serde", serde(default))]
     pub license_expression: Option<String>,
-    /// The path to a file containing the text of the license covering the distribution.
+    /// Paths to files containing the text of the licenses covering the distribution.
     #[cfg_attr(feature = "serde", serde(default))]
-    pub license_file: Option<String>,
+    pub license_files: Vec<String>,
     /// Each entry is a string giving a single classification value for the distribution.
     #[cfg_attr(feature = "serde", serde(default))]
     pub classifiers: Vec<String>,
@@ -159,7 +159,7 @@ impl Metadata {
         let author_email = get_first_value("Author-email");
         let license = get_first_value("License");
         let license_expression = get_first_value("License-Expression");
-        let license_file = get_first_value("License-File");
+        let license_files = get_all_values("License-File");
         let classifiers = get_all_values("Classifier");
         let requires_dist = get_all_values("Requires-Dist");
         let provides_dist = get_all_values("Provides-Dist");
@@ -187,7 +187,7 @@ impl Metadata {
             author_email,
             license,
             license_expression,
-            license_file,
+            license_files,
             classifiers,
             requires_dist,
             provides_dist,
