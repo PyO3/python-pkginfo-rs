@@ -59,13 +59,13 @@ impl FromStr for SDistType {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let dist_type = match s {
             "zip" => SDistType::Zip,
-            "gz" => SDistType::GzTar,
+            "gz" | "tgz" => SDistType::GzTar,
             #[cfg(feature = "deprecated-formats")]
             "tar" => SDistType::Tar,
             #[cfg(feature = "bzip2")]
-            "bz2" => SDistType::BzTar,
+            "bz2" | "tbz" => SDistType::BzTar,
             #[cfg(feature = "xz")]
-            "xz" => SDistType::XzTar,
+            "txz" | "xz" => SDistType::XzTar,
             _ => return Err(Error::UnknownDistributionType),
         };
         Ok(dist_type)
