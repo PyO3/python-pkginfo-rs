@@ -76,25 +76,20 @@ impl Distribution {
     /// Open and parse a distribution from `path`
     pub fn new(path: impl AsRef<Path>) -> Result<Self, Error> {
         let path = path.as_ref();
-        if let Some(ext) = path.extension().and_then(|ext| ext.to_str()) {
-            let dist_type = match ext {
-                "zip" | "gz" => DistributionType::SDist,
-                "egg" => DistributionType::Egg,
-                "whl" => DistributionType::Wheel,
-                #[cfg(feature = "deprecated-formats")]
-                "tar" => DistributionType::SDist,
-                #[cfg(feature = "bzip2")]
-                "bz2" => DistributionType::SDist,
-                #[cfg(feature = "xz")]
-                "xz" => DistributionType::SDist,
-                _ => return Err(Error::UnknownDistributionType),
-            };
-            let (metadata, python_version) = match dist_type {
-                DistributionType::SDist => {
-                    let sdist_type: SDistType = ext.parse()?;
-                    (Self::parse_sdist(path, sdist_type)?, "source".to_string())
-                }
-                DistributionType::Egg => {
+        let ext = path
+            .extension()
+            .and_then(|ext| ext.to_str())
+            .ok_or(Error::UnknownDistributionType)?;
+
+        Ok(if let Ok(sdist_type) = ext.parse() {
+            Self {
+                dist_type: DistributionType::SDist,
+                metadata: Self::parse_sdist(path, sdist_type)?,
+                python_version: "source".to_string(),
+            }
+        } else {
+            match ext {
+                "egg" => {
                     let parts: Vec<&str> = path
                         .file_stem()
                         .unwrap()
@@ -106,9 +101,13 @@ impl Distribution {
                         [_name, _version, py_ver] => py_ver,
                         _ => "any",
                     };
-                    (Self::parse_egg(path)?, python_version.to_string())
+                    Self {
+                        dist_type: DistributionType::Egg,
+                        metadata: Self::parse_egg(path)?,
+                        python_version: python_version.to_string(),
+                    }
                 }
-                DistributionType::Wheel => {
+                "whl" => {
                     let parts: Vec<&str> = path
                         .file_stem()
                         .unwrap()
@@ -120,16 +119,15 @@ impl Distribution {
                         [_name, _version, py_ver, _abi_tag, _plat_tag] => py_ver,
                         _ => "any",
                     };
-                    (Self::parse_wheel(path)?, python_version.to_string())
+                    Self {
+                        dist_type: DistributionType::Wheel,
+                        metadata: Self::parse_wheel(path)?,
+                        python_version: python_version.to_string(),
+                    }
                 }
-            };
-            return Ok(Self {
-                dist_type,
-                metadata,
-                python_version,
-            });
-        }
-        Err(Error::UnknownDistributionType)
+                _ => return Err(Error::UnknownDistributionType),
+            }
+        })
     }
 
     /// Returns distribution type
