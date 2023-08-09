@@ -34,8 +34,6 @@ enum SDistType {
     #[cfg(feature = "bzip2")]
     BzTar,
     #[cfg(feature = "xz")]
-    LzTar,
-    #[cfg(feature = "xz")]
     XzTar,
 }
 
@@ -69,9 +67,7 @@ impl FromStr for SDistType {
             #[cfg(feature = "bzip2")]
             "bz2" | "tbz" => SDistType::BzTar,
             #[cfg(feature = "xz")]
-            "lz" | "lzma" | "tlz" => SDistType::LzTar,
-            #[cfg(feature = "xz")]
-            "txz" | "xz" => SDistType::XzTar,
+            "lz" | "lzma" | "tlz" | "txz" | "xz" => SDistType::XzTar,
             _ => return Err(Error::UnknownDistributionType),
         };
         Ok(dist_type)
@@ -166,14 +162,10 @@ impl Distribution {
                 Self::parse_tar(BzDecoder::new(BufReader::new(fs_err::File::open(path)?)))
             }
             #[cfg(feature = "xz")]
-            SDistType::LzTar => Self::parse_tar(XzDecoder::new_stream(
+            SDistType::XzTar => Self::parse_tar(XzDecoder::new_stream(
                 BufReader::new(fs_err::File::open(path)?),
-                XzStream::new_lzma_decoder(u64::max_value()).unwrap(),
+                XzStream::new_auto_decoder(u64::max_value(), 0).unwrap(),
             )),
-            #[cfg(feature = "xz")]
-            SDistType::XzTar => {
-                Self::parse_tar(XzDecoder::new(BufReader::new(fs_err::File::open(path)?)))
-            }
         }
     }
 
