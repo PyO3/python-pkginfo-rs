@@ -7,7 +7,9 @@ use std::str::FromStr;
 use bzip2::read::BzDecoder;
 use flate2::read::GzDecoder;
 #[cfg(feature = "xz")]
-use xz::read::XzDecoder;
+use xz::bufread::XzDecoder;
+#[cfg(feature = "xz")]
+use xz::stream::Stream as XzStream;
 use zip::ZipArchive;
 
 use crate::{Error, Metadata};
@@ -59,13 +61,13 @@ impl FromStr for SDistType {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let dist_type = match s {
             "zip" => SDistType::Zip,
-            "gz" => SDistType::GzTar,
+            "gz" | "tgz" => SDistType::GzTar,
             #[cfg(feature = "deprecated-formats")]
             "tar" => SDistType::Tar,
             #[cfg(feature = "bzip2")]
-            "bz2" => SDistType::BzTar,
+            "bz2" | "tbz" => SDistType::BzTar,
             #[cfg(feature = "xz")]
-            "xz" => SDistType::XzTar,
+            "lz" | "lzma" | "tlz" | "txz" | "xz" => SDistType::XzTar,
             _ => return Err(Error::UnknownDistributionType),
         };
         Ok(dist_type)
@@ -76,25 +78,20 @@ impl Distribution {
     /// Open and parse a distribution from `path`
     pub fn new(path: impl AsRef<Path>) -> Result<Self, Error> {
         let path = path.as_ref();
-        if let Some(ext) = path.extension().and_then(|ext| ext.to_str()) {
-            let dist_type = match ext {
-                "zip" | "gz" => DistributionType::SDist,
-                "egg" => DistributionType::Egg,
-                "whl" => DistributionType::Wheel,
-                #[cfg(feature = "deprecated-formats")]
-                "tar" => DistributionType::SDist,
-                #[cfg(feature = "bzip2")]
-                "bz2" => DistributionType::SDist,
-                #[cfg(feature = "xz")]
-                "xz" => DistributionType::SDist,
-                _ => return Err(Error::UnknownDistributionType),
-            };
-            let (metadata, python_version) = match dist_type {
-                DistributionType::SDist => {
-                    let sdist_type: SDistType = ext.parse()?;
-                    (Self::parse_sdist(path, sdist_type)?, "source".to_string())
-                }
-                DistributionType::Egg => {
+        let ext = path
+            .extension()
+            .and_then(|ext| ext.to_str())
+            .ok_or(Error::UnknownDistributionType)?;
+
+        Ok(if let Ok(sdist_type) = ext.parse() {
+            Self {
+                dist_type: DistributionType::SDist,
+                metadata: Self::parse_sdist(path, sdist_type)?,
+                python_version: "source".to_string(),
+            }
+        } else {
+            match ext {
+                "egg" => {
                     let parts: Vec<&str> = path
                         .file_stem()
                         .unwrap()
@@ -106,9 +103,13 @@ impl Distribution {
                         [_name, _version, py_ver] => py_ver,
                         _ => "any",
                     };
-                    (Self::parse_egg(path)?, python_version.to_string())
+                    Self {
+                        dist_type: DistributionType::Egg,
+                        metadata: Self::parse_egg(path)?,
+                        python_version: python_version.to_string(),
+                    }
                 }
-                DistributionType::Wheel => {
+                "whl" => {
                     let parts: Vec<&str> = path
                         .file_stem()
                         .unwrap()
@@ -120,16 +121,15 @@ impl Distribution {
                         [_name, _version, py_ver, _abi_tag, _plat_tag] => py_ver,
                         _ => "any",
                     };
-                    (Self::parse_wheel(path)?, python_version.to_string())
+                    Self {
+                        dist_type: DistributionType::Wheel,
+                        metadata: Self::parse_wheel(path)?,
+                        python_version: python_version.to_string(),
+                    }
                 }
-            };
-            return Ok(Self {
-                dist_type,
-                metadata,
-                python_version,
-            });
-        }
-        Err(Error::UnknownDistributionType)
+                _ => return Err(Error::UnknownDistributionType),
+            }
+        })
     }
 
     /// Returns distribution type
@@ -162,9 +162,10 @@ impl Distribution {
                 Self::parse_tar(BzDecoder::new(BufReader::new(fs_err::File::open(path)?)))
             }
             #[cfg(feature = "xz")]
-            SDistType::XzTar => {
-                Self::parse_tar(XzDecoder::new(BufReader::new(fs_err::File::open(path)?)))
-            }
+            SDistType::XzTar => Self::parse_tar(XzDecoder::new_stream(
+                BufReader::new(fs_err::File::open(path)?),
+                XzStream::new_auto_decoder(u64::max_value(), 0).unwrap(),
+            )),
         }
     }
 
