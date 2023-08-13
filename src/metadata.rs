@@ -46,9 +46,15 @@ pub struct Metadata {
     /// A string containing the author’s e-mail address. It can contain a name and e-mail address in the legal forms for a RFC-822 `From:` header.
     #[cfg_attr(feature = "serde", serde(default))]
     pub author_email: Option<String>,
-    /// Text indicating the license covering the distribution where the license is not a selection from the `License` Trove classifiers.
+    /// Text indicating the license covering the distribution where the license is not a selection from the `License` Trove classifiers or an SPDX license expression.
     #[cfg_attr(feature = "serde", serde(default))]
     pub license: Option<String>,
+    /// An SPDX expression indicating the license covering the distribution.
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub license_expression: Option<String>,
+    /// Paths to files containing the text of the licenses covering the distribution.
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub license_files: Vec<String>,
     /// Each entry is a string giving a single classification value for the distribution.
     #[cfg_attr(feature = "serde", serde(default))]
     pub classifiers: Vec<String>,
@@ -152,6 +158,8 @@ impl Metadata {
         let author = get_first_value("Author");
         let author_email = get_first_value("Author-email");
         let license = get_first_value("License");
+        let license_expression = get_first_value("License-Expression");
+        let license_files = get_all_values("License-File");
         let classifiers = get_all_values("Classifier");
         let requires_dist = get_all_values("Requires-Dist");
         let provides_dist = get_all_values("Provides-Dist");
@@ -178,6 +186,8 @@ impl Metadata {
             author,
             author_email,
             license,
+            license_expression,
+            license_files,
             classifiers,
             requires_dist,
             provides_dist,
