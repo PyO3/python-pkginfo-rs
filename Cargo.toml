@@ -13,7 +13,7 @@ repository = "https://github.com/PyO3/python-pkginfo-rs"
 
 [dependencies]
 bzip2 = { version = "0.4.4", optional = true }
-flate2 = "1.0.20"
+flate2 = "1.0.22"
 fs-err = "2.6.0"
 mailparse = "0.15"
 rfc2047-decoder = "1.0.5"
@@ -21,7 +21,7 @@ serde = { version = "1.0.126", features = ["derive"], optional = true }
 tar = "0.4.35"
 thiserror = "1.0.30"
 xz = { version = "0.1.0", optional = true }
-zip = { version = "1.0.0", default-features = false, features = ["bzip2", "deflate", "time"] }
+zip = { version = ">=0.6,<2", default-features = false, features = ["bzip2", "deflate", "time"] }
 
 [dev-dependencies]
 serde_json = "1.0.99"
