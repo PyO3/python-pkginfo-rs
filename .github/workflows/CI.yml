@@ -27,6 +27,16 @@ jobs:
       - run: cargo test
       - run: cargo test --all-features
 
+  test-direct-minimal-versions:
+    name: Test Direct Minimal Versions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@nightly
+      - run: cargo +nightly update -Z minimal-versions
+      - run: cargo +stable test
+
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
