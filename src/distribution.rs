@@ -164,7 +164,7 @@ impl Distribution {
             #[cfg(feature = "xz")]
             SDistType::XzTar => Self::parse_tar(XzDecoder::new_stream(
                 BufReader::new(fs_err::File::open(path)?),
-                XzStream::new_auto_decoder(u64::max_value(), 0).unwrap(),
+                XzStream::new_auto_decoder(u64::MAX, 0).unwrap(),
             )),
         }
     }
