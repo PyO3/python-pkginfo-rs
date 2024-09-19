@@ -9,14 +9,14 @@ A Rust port of the [pkginfo](https://pypi.org/project/pkginfo/) Python library.
 
 ## Installation
 
-Add it to your ``Cargo.toml``:
+Add it to your `Cargo.toml`:
 
 ```toml
 [dependencies]
 python-pkginfo = "0.6"
 ```
 
-then you are good to go. If you are using Rust 2015 you have to add ``extern crate python_pkginfo`` to your crate root as well.
+then you are good to go. If you are using Rust 2015 you have to add `extern crate python_pkginfo` to your crate root as well.
 
 ## Example
 
