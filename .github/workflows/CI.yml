@@ -30,6 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: rustup toolchain add nightly
       - run: cargo +nightly update -Z minimal-versions
       - run: cargo +stable test
 
