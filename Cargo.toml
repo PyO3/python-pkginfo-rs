@@ -1,6 +1,6 @@
 [package]
 name = "python-pkginfo"
-version = "0.6.2"
+version = "0.6.3"
 authors = ["messense <messense@icloud.com>"]
 edition = "2021"
 description = "Parse Python package metadata from sdist and bdists and etc."
@@ -21,10 +21,10 @@ serde = { version = "1.0.126", features = ["derive"], optional = true }
 tar = "0.4.35"
 thiserror = "1.0.30"
 xz = { version = "0.1.0", optional = true }
-zip = { version = ">=0.6,<2", default-features = false, features = ["bzip2", "deflate", "time"] }
+zip = { version = ">=0.6,<2", default-features = false, features = ["deflate"] }
 
 [dev-dependencies]
 serde_json = "1.0.99"
 
 [features]
-deprecated-formats = ["bzip2", "xz"]
+deprecated-formats = ["bzip2", "xz", "zip/bzip2"]
