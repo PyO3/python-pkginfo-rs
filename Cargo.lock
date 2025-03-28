@@ -337,7 +337,7 @@ dependencies = [
 
 [[package]]
 name = "python-pkginfo"
-version = "0.6.5"
+version = "0.6.6"
 dependencies = [
  "bzip2",
  "flate2",
