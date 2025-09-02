@@ -11,7 +11,7 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: cargo check --all-features
 
   test:
@@ -21,7 +21,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: cargo test
       - run: cargo test --all-features
 
@@ -29,7 +29,7 @@ jobs:
     name: Test Direct Minimal Versions
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: rustup toolchain add nightly
       - run: cargo +nightly update -Z minimal-versions
       - run: cargo +stable test
@@ -37,7 +37,7 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: rustup component add clippy
       - run: cargo clippy --all-features --locked -- -D warnings
 
@@ -45,7 +45,7 @@ jobs:
     name: Format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: rustup component add rustfmt
       - run: cargo fmt --all -- --check
       - run: npx prettier --check "**/*.md"
