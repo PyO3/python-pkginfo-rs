@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.7
+
+- Allow zip 7
+- Allow bzip2 0.6
+
 ## 0.6.6
 
 - Update bzip2 to 0.5
