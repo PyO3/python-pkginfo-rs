@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.8
+
+- Allow zip 8
+
 ## 0.6.7
 
 - Allow zip 7
