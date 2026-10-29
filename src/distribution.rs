@@ -203,8 +203,9 @@ impl Distribution {
     fn parse_zip(path: &Path, metadata_file_suffix: &str) -> Result<Metadata, Error> {
         let reader = BufReader::new(fs_err::File::open(path)?);
         let mut archive = ZipArchive::new(reader)?;
-        let metadata_files: Vec<_> = archive
-            .file_names()
+        let file_names = archive.file_names().collect::<Result<Vec<_>, _>>()?;
+        let metadata_files: Vec<_> = file_names
+            .iter()
             .filter(|name| name.ends_with(metadata_file_suffix))
             .map(ToString::to_string)
             .collect();
